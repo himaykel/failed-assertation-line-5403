@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'cart_item.dart';
 import '../providers/cart.dart' show Cart;
+
 import '../providers/orders.dart';
 
 class CartScreen extends StatelessWidget {
@@ -31,19 +32,14 @@ class CartScreen extends StatelessWidget {
                   Chip(
                       label: Text('\$${cart.TotalAmount}'),
                       backgroundColor: Theme.of(context).primaryColor),
-                  TextButton(
-                    child: Text('ORDER NOW'),
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                          cart.items.values.toList(), cart.TotalAmount);
-                      cart.clear();
-                    },
-                  )
+                  OrderButton(cart: cart),
                 ],
               ),
             ),
           ),
-          SizedBox(),
+          SizedBox(
+            height: 10,
+          ),
           Expanded(
               child: ListView.builder(
             itemCount: cart.items.length,
@@ -56,6 +52,44 @@ class CartScreen extends StatelessWidget {
           ))
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key? key,
+    required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      child: _isLoading ? CircularProgressIndicator() : Text('ORDER NOW'),
+      onPressed: (widget.cart.TotalAmount <= 0 || _isLoading)
+          ? null
+          : () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await Provider.of<Orders>(context, listen: false).addOrder(
+                widget.cart.items.values.toList(),
+                widget.cart.TotalAmount,
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              widget.cart.clear();
+            },
     );
   }
 }
