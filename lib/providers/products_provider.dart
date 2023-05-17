@@ -42,6 +42,12 @@ class ProductProvider with ChangeNotifier {
     // ),
   ];
 
+  final String? authToken;
+  ProductProvider(
+    this.authToken,
+    this._items,
+  );
+
   List<Product> get items {
     return [..._items];
   }
@@ -54,13 +60,44 @@ class ProductProvider with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
+  // Future<void> fetchAndSetProducts() async {
+  //   final url = Uri.https(
+  //       'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
+  //       '/products.json?auth=$authToken');
+  //   try {
+  //     final response = await http.get(url);
+  //     final extractedData = json.decode(response.body) as Map<String, dynamic>;
+  //     print(response.body);
+  //     final List<Product> loadedProducts = [];
+  //     extractedData.forEach((prodId, prodData) {
+  //       loadedProducts.add(Product(
+  //         id: prodId,
+  //         title: prodData['title'],
+  //         description: prodData['description'],
+  //         price: prodData['price'],
+  //         isFavorite: prodData['isFavorite'],
+  //         imageUrl: prodData['imageUrl'],
+  //       ));
+  //     });
+  //     _items = loadedProducts;
+  //     notifyListeners();
+  //   } catch (error) {
+  //     throw (error);
+  //   }
+  // }
+
   Future<void> fetchAndSetProducts() async {
     final url = Uri.https(
         'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products.json');
+        '/products.json?auth=$authToken');
+    // final url =
+    //     'https://shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) {
+        return;
+      }
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
