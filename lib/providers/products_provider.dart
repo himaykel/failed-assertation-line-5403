@@ -274,14 +274,14 @@ class ProductProvider with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final url = Uri.https(
-        'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products.json?auth=$authToken');
+      'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
+      '/products.json',
+      {'auth': authToken},
+    );
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      if (extractedData == null) {
-        return;
-      }
+
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -303,8 +303,9 @@ class ProductProvider with ChangeNotifier {
   Future<void> addProduct(Product product) async {
     // final url = 'https://flutter-update.firebaseio.com/products.json?auth=$authToken';
     final url = Uri.https(
-        'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products.json?auth=$authToken');
+      'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
+      '/products.json?auth=$authToken',
+    );
     try {
       final response = await http.post(
         url,
@@ -338,8 +339,9 @@ class ProductProvider with ChangeNotifier {
       // final url =
       //     'https://flutter-update.firebaseio.com/products/$id.json?auth=$authToken';
       final url = Uri.https(
-          'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
-          '/products/$id.json?auth=$authToken');
+        'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
+        '/products/$id.json?auth=$authToken',
+      );
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -358,8 +360,9 @@ class ProductProvider with ChangeNotifier {
     // final url =
     //     'https://flutter-update.firebaseio.com/products/$id.json?auth=$authToken';
     final url = Uri.https(
-        'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products/$id.json?auth=$authToken');
+      'shop-app-748e1-default-rtdb.europe-west1.firebasedatabase.app',
+      '/products/$id.json?auth=$authToken',
+    );
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     Product? existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
